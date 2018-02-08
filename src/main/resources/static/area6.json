@@ -1,0 +1,12 @@
+{
+	"province": [{
+		"province_id": "1",
+		"province_name": "\ufeff\u6728"
+	}],
+	"city": [{
+		"city_name": "ÁúÈªÊÐ",
+		"province_id": "1",
+		"zip_code": "03401",
+		"city_id": "331181"
+	}]
+}

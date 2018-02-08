@@ -1,0 +1,16 @@
+{
+	"province": [{
+		"province_name": "山西",
+		"province_id": "4"
+
+	}],
+	"city": [{
+		"city_id": "21",
+		"city_name": "运城市",
+		"zip_code": "03401",
+		"province_id": "4"
+	}]
+
+
+
+}
