@@ -54,16 +54,55 @@ select{
     </script>
    <script type="text/javascript">
    $(function (){
-	   $("#tj").click(function (){
-		   swal({
-			   title: "正在采集中",
-			   text: "请稍后....",
-			   timer: 20000,
-			   showConfirmButton: false
-			 });
-	   })
+	
+		var qydms="";
+		   $("#tj").click(function (){
+			   var province=$("*[name='province']").val();
+			   var city=$("*[name='city']").val();
+			   var district=$("*[name='district']").val();
+
+			   if(city!=""||district!=""){
+				   if(district!=""){
+					   qydms=district;
+				   }else{
+					   qydms=city;
+				   }
+		
+				   swal({
+					   title: "正在采集中",
+					   text: "请稍后....",
+					   timer: 20000,
+					   showConfirmButton: false
+					 });
+		 			$.ajax({
+		 			    url:'doData/doDetail',
+		 			    type:'GET', //GET
+		 			    data:{
+		 			    	qydm:qydms
+		 			    },
+
+		 			    success:function(data,textStatus){
+					
+					    
+					    
+					     
+		 			    },
+		 			    error:function(xhr,textStatus){
+					     
+		 			    }
+		 			})
+			   }else{
+			        swal("失败!", "选择有误", "error")
+			   }
+			 
+		
+		   })
+	  
+
    })
    </script>
+   
+  
 </head>
 <body>
 <div align="center" style="margin-top:300px">
