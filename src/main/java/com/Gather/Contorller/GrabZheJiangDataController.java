@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.Gather.ehtity.GrabZheJiangDataInfo;
 import com.Gather.service.GrabZheJiangDataService;
 
+import net.sf.json.JSONObject;
+
 @Controller
 @RequestMapping("doData")
 public class GrabZheJiangDataController {
@@ -29,10 +31,11 @@ public class GrabZheJiangDataController {
      */
     @RequestMapping(value = "doDetail", method = RequestMethod.GET)
     @ResponseBody
-    public String getBataByQydm(HttpServletRequest request, String qydm, Model model) {
+    public JSONObject getBataByQydm(HttpServletRequest request, String qydm) {
     	List<GrabZheJiangDataInfo> list = service.getBataByQydm(qydm);
-    	model.addAttribute("list", list);
-    	model.addAttribute("total", list.size());
-        return "";
+    	JSONObject obj = new JSONObject();
+    	obj.put("list", list);
+    	obj.put("total", list.size());
+        return JSONObject.fromObject(obj);
     }
 }

@@ -1,6 +1,10 @@
 package com.Gather.service;
 
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -11,10 +15,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.Gather.ehtity.GrabZheJiangDataInfo;
+import com.Gather.util.DBConnection;
 import com.Gather.util.HtmlUnitUtil;
 import com.Gather.util.JsonUtil;
 import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
 import com.gargoylesoftware.htmlunit.WebClient;
+import com.sun.glass.ui.Size;
 
 @Service
 public class GrabZheJiangDataService {
@@ -50,19 +56,17 @@ public class GrabZheJiangDataService {
 			if(!response.equals("[]")) {
 				list = JsonUtil.jsonToList(response.replace("\\\"", "'"), GrabZheJiangDataInfo.class);
 				for (GrabZheJiangDataInfo info : list) {
-					
-					String enterpriseName = this.approvalDetail(info.getProjectId(), info.getApprovalItemId(), webClient);
-					info.setEnterpriseName(enterpriseName);
-					info.setZcrq(this.getCurrentTime());
-//				String xmdm = info.getItemId();
-//				List<GrabDomainBasicInfo> infos = grabZheJiangDataDao.getByXmdm(xmdm);
-//				if(infos != null && infos.size() > 0) {
-//					list.remove(info);
-//				}else {
-//					info.setEnterpriseName(this.approvalDetail(info.getProjectId(), info.getApprovalItemId(), webClient));
-//				}
+					String xmdm = info.getItemId();
+					if(this.isExist(xmdm)) {
+						list.remove(info);
+					}else {
+						String enterpriseName = this.approvalDetail(info.getProjectId(), info.getApprovalItemId(), webClient);
+						info.setEnterpriseName(enterpriseName);
+						info.setZcrq(this.getCurrentTime());
+						info.setEnterpriseName(this.approvalDetail(info.getProjectId(), info.getApprovalItemId(), webClient));
+					}
 				}
-				System.out.println(list);
+				this.insertEntity(list);
 			}
 		} catch (Exception e) {
 			logger.error("获取数据失败",e);
@@ -88,7 +92,6 @@ public class GrabZheJiangDataService {
 				+ projectId
 				+ "&approvalItemId="
 				+ approvalItemId;
-		
 		String response = new HtmlUnitUtil().webRequestByGet(url, webClient).replace("\\\"", "'");
 		
 		Object obj = JsonUtil.getJsonValue1(response.replace("\"", ""), "enterpriseName");
@@ -99,10 +102,87 @@ public class GrabZheJiangDataService {
 		return enterpriseName;
 	}
 	
-	
+	/**
+	 * 获取系统当前时间
+	 * @return
+	 */
 	private String getCurrentTime() {
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");//设置日期格式
 		// new Date()为获取当前系统时间
 		return df.format(new Date());
 	}
+	
+	/**
+	 * 根据项目代码查询是否有该条信息
+	 * @param xmbadm
+	 * @return
+	 * @throws SQLException 
+	 */
+	private Boolean isExist(String xmbadm) throws SQLException {
+//		DBConnection connection = new DBConnection("reckon");  
+		ResultSet rs = DBConnection.selectQuery("reckon", "select * from xmbqxx where xmbadm = '"+xmbadm+"'");
+		Boolean flag = false;
+		if(rs != null) {
+			int count = 0;  
+			while(rs.next()) {  
+				count++;  
+			}   
+			if(count > 0) {
+				flag = true;
+			}
+		}
+		DBConnection.closeConn();
+		return flag;
+	}
+	
+	/**
+	 * 
+	 * @param list
+	 * @return
+	 * @throws SQLException 
+	 */
+	private void insertEntity(List<GrabZheJiangDataInfo> list) throws SQLException {
+		String sql = "insert into xmbqxx(xmbadm, xmmc, xmfrdw,spsx, glbm, blzd, blrq, zcrq)"
+				+ "values (?,?,?,?,?,?,?,?)";
+
+		Connection connection = DBConnection.getConnect("reckon");
+
+		PreparedStatement pstmt = connection.prepareStatement(sql);
+
+		//每次提交最大条数
+
+		final int batchSize = 5000;
+
+		int count = 0;
+
+		for (GrabZheJiangDataInfo item: list) {
+
+		    pstmt.setString(1, item.getItemId());
+		    pstmt.setString(2, item.getSpareE());
+		    pstmt.setString(3, item.getEnterpriseName());
+		    pstmt.setString(4, item.getItemName());
+		    pstmt.setString(5, item.getDeptName());
+		    pstmt.setString(6, item.getSpareB());
+		    pstmt.setString(7, item.getSpareA());
+		    pstmt.setString(8, item.getZcrq());
+
+		    pstmt.addBatch();
+
+		    if(++count % batchSize == 0) {
+
+		       pstmt.executeBatch();
+
+		    }
+
+		}
+
+		//提交剩余的数据
+
+		pstmt.executeBatch(); 
+
+		pstmt.close();
+
+		connection.close();
+	}
+	
 }
