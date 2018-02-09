@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -90,6 +91,45 @@ public class GrabZheJiangDataService {
 			}
 		}
 		return list;
+	}
+	
+	/**
+	 * 删除
+	 * @param id
+	 * @return
+	 * @throws SQLException 
+	 */
+	public boolean doDelete(String id)  {
+		Connection connection = null;
+		Statement statement = null;
+		try {
+			connection = DBConnection.getConnect("reckon");
+			statement = connection.createStatement();
+			String deleteTableSQL = "DELETE FROM xmbqxx WHERE xmbadm = '"+id+"'";
+			statement.execute(deleteTableSQL);
+			connection.commit();
+			return true;
+		} catch (SQLException e) {
+			logger.error("删除失败，xmbadm="+ id,e);
+			return false;
+		}finally {
+            if (statement != null) {
+                try {
+					statement.close();
+				} catch (SQLException e) {
+					logger.error("关闭数据库失败",e);
+				}
+            }
+            if (connection != null) {
+            	try {
+					connection.close();
+				} catch (SQLException e) {
+					logger.error("关闭数据库失败",e);
+				}
+            }
+ 
+        }
+		
 	}
 	
 	/**
@@ -193,7 +233,7 @@ public class GrabZheJiangDataService {
 		//提交剩余的数据
 
 		pstmt.executeBatch(); 
-
+		connection.commit();
 		pstmt.close();
 
 		connection.close();

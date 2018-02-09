@@ -38,4 +38,12 @@ public class GrabZheJiangDataController {
     	obj.put("total", list.size());
         return JSONObject.fromObject(obj);
     }
+    
+    
+    @RequestMapping(value = "doDelete", method = RequestMethod.GET)
+    @ResponseBody
+    public boolean getBataById(HttpServletRequest request, String id) {
+    	boolean flag = service.doDelete(id);
+    	return flag;
+    }
 }
