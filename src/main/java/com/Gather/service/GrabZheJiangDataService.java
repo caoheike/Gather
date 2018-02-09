@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -20,7 +21,6 @@ import com.Gather.util.HtmlUnitUtil;
 import com.Gather.util.JsonUtil;
 import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
 import com.gargoylesoftware.htmlunit.WebClient;
-import com.sun.glass.ui.Size;
 
 @Service
 public class GrabZheJiangDataService {
@@ -55,17 +55,31 @@ public class GrabZheJiangDataService {
 			String response = new HtmlUnitUtil().webRequestByGet(url,webClient);
 			if(!response.equals("[]")) {
 				list = JsonUtil.jsonToList(response.replace("\\\"", "'"), GrabZheJiangDataInfo.class);
-				for (GrabZheJiangDataInfo info : list) {
+				Iterator<GrabZheJiangDataInfo> iter = list.iterator();  
+				while (iter.hasNext()) {  
+					GrabZheJiangDataInfo info = iter.next();  
 					String xmdm = info.getItemId();
 					if(this.isExist(xmdm)) {
-						list.remove(info);
+						iter.remove();  
 					}else {
 						String enterpriseName = this.approvalDetail(info.getProjectId(), info.getApprovalItemId(), webClient);
 						info.setEnterpriseName(enterpriseName);
 						info.setZcrq(this.getCurrentTime());
-						info.setEnterpriseName(this.approvalDetail(info.getProjectId(), info.getApprovalItemId(), webClient));
 					}
-				}
+		            	
+		        }
+				
+//				for (int i = 0; i < list.size(); i++) {
+//					GrabZheJiangDataInfo info = list.get(i);
+//					String xmdm = info.getItemId();
+//					if(this.isExist(xmdm)) {
+//						list.remove(info);
+//					}else {
+//						String enterpriseName = this.approvalDetail(info.getProjectId(), info.getApprovalItemId(), webClient);
+//						info.setEnterpriseName(enterpriseName);
+//						info.setZcrq(this.getCurrentTime());
+//					}
+//				}
 				this.insertEntity(list);
 			}
 		} catch (Exception e) {
@@ -107,7 +121,7 @@ public class GrabZheJiangDataService {
 	 * @return
 	 */
 	private String getCurrentTime() {
-		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");//设置日期格式
+		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");//设置日期格式
 		// new Date()为获取当前系统时间
 		return df.format(new Date());
 	}
