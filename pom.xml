@@ -50,6 +50,13 @@
         </dependency>
 
         <!--数据库连接池 -->
+        
+<dependency>
+<groupId>acc</groupId>
+<artifactId>acc</artifactId>
+<version>2.0.8</version>
+</dependency>
+        
         <dependency>
             <groupId>com.zaxxer</groupId>
             <artifactId>HikariCP</artifactId>

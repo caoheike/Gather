@@ -36,13 +36,13 @@ public class TestConller {
 		// Access中的数据库默认编码为GBK，本地项目为UTF-8，若不转码会出现乱码
 		Properties p = new Properties();
 		p.put("charSet", "GBK");
-	     connect = DriverManager.getConnection("Jdbc:Access:///E:/reckon.mdb","","");  
+	     connect = DriverManager.getConnection("Jdbc:Access:///D:/qytj/datebase/#cn-enet#.mdb","","");  
 		if (connect != null) {
 			System.out.println(connect + "\n连接成功");
 		} else {
 			System.out.println("连接失败");
 		}
-		rs = DBConnection.selectQuery("reckon", "select * from xzqydm");
+		rs = DBConnection.selectQuery("#cn-enet#", "select * from xzqydm");
 		JSONObject jsonObject=new JSONObject();  //最大的key
 		String jsonstr = null;
 		if (rs != null) {
@@ -54,10 +54,10 @@ public class TestConller {
 //			arrays.add(jsonObject1);
 			JSONArray arrays2=new JSONArray();
 			JSONArray arrays3=new JSONArray();
-			JSONObject jsonObject1=new JSONObject(); //需要方到array  杭州
-			jsonObject1.put("province_id","1");
-			jsonObject1.put("province_name", "浙江省");     //市
-			arrays.add(jsonObject1);
+//			JSONObject jsonObject1=new JSONObject(); //需要方到array  杭州
+//			jsonObject1.put("province_id","1");
+//			jsonObject1.put("province_name", "浙江省");     //市
+//			arrays.add(jsonObject1);
 			while (rs.next()) {
 				String var1=rs.getString(1);//代码
 				String var2=rs.getString(2);//名字
@@ -70,21 +70,33 @@ public class TestConller {
 						
 					}else if(var3.contains("市")) {
 						JSONObject jsonObject3=new JSONObject();//放入区
-						jsonObject3.put("city_id",var1 );
-						jsonObject3.put("zip_code", "03401");
-						jsonObject3.put("province_id",1);//父级
-						jsonObject3.put("city_name",var2);
+						jsonObject3.put("province_id",var1 );
+						jsonObject3.put("province_name",var2);
 						arrays2.add(jsonObject3);
-						jsonObject.put("city",arrays2 );
+//						jsonObject.put("city",arrays2 );
 					
 					}else if(var3.contains("区")||var3.contains("县")) {
-						
-						JSONObject jsonObject3=new JSONObject();//放入区
-						jsonObject3.put("district_id",var1 );
-						jsonObject3.put("city_id",var5);//父级
-						jsonObject3.put("district_name",var2 );
-						arrays3.add(jsonObject3);
-						jsonObject.put("district",arrays3);
+							
+							if(var2.equals("市辖区")) {
+								String str="";
+								char[] chars=var1.toCharArray();
+								for (int i = 0; i < chars.length; i++) {
+									if(i==chars.length||i==chars.length-1) {
+										str +=0;
+									}else {
+									str += chars[i];
+									}
+								}
+								var1=str;
+								
+							}
+							JSONObject jsonObject3=new JSONObject();//放入区
+							jsonObject3.put("city_id",var1 );
+							jsonObject3.put("zip_code", "03401");
+							jsonObject3.put("province_id", var5);//父级
+							jsonObject3.put("city_name",var2);
+							arrays3.add(jsonObject3);
+				
 						
 					}
 						//else if(var3.contains("县")) {
@@ -98,7 +110,8 @@ public class TestConller {
 //					}
 				
 			}
-		jsonObject.put("province",arrays );
+		jsonObject.put("province",arrays2 );
+		jsonObject.put("city",arrays3 );
 		jsonstr=jsonObject.toJSONString().replaceAll("\\\\\\\\", "\\\\");
 		return jsonstr;
 
@@ -110,6 +123,7 @@ public class TestConller {
 	
 	@RequestMapping("/test1")
 	public String test1()  {
+		
 		
 		
 	return "index";

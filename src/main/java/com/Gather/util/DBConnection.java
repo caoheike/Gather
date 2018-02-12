@@ -24,7 +24,7 @@ public class DBConnection {
             p.put("charSet", "GBK");  
 //            connect = DriverManager.getConnection("jdbc:odbc:"+db,p);  
 //            connect = DriverManager.getConnection("jdbc:Access:///reckon.mdb","","");  
-            connect = DriverManager.getConnection("Jdbc:Access:///E:/reckon.mdb","","");  
+            connect = DriverManager.getConnection("Jdbc:Access:///D:/qytj/datebase/#cn-enet#.mdb","","");  
         }catch(Exception e){  
             e.printStackTrace();  
         }  

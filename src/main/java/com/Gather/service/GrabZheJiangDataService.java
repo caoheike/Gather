@@ -103,9 +103,9 @@ public class GrabZheJiangDataService {
 		Connection connection = null;
 		Statement statement = null;
 		try {
-			connection = DBConnection.getConnect("reckon");
+			connection = DBConnection.getConnect("#cn-enet#");
 			statement = connection.createStatement();
-			String deleteTableSQL = "DELETE FROM xmbqxx WHERE xmbadm = '"+id+"'";
+			String deleteTableSQL = "DELETE FROM xmbaxx WHERE xmbadm = '"+id+"'";
 			statement.execute(deleteTableSQL);
 			connection.commit();
 			return true;
@@ -173,8 +173,8 @@ public class GrabZheJiangDataService {
 	 * @throws SQLException 
 	 */
 	private Boolean isExist(String xmbadm) throws SQLException {
-//		DBConnection connection = new DBConnection("reckon");  
-		ResultSet rs = DBConnection.selectQuery("reckon", "select * from xmbqxx where xmbadm = '"+xmbadm+"'");
+//		DBConnection connection = new DBConnection("#cn-enet#");  
+		ResultSet rs = DBConnection.selectQuery("#cn-enet#", "select * from xmbaxx where xmbadm = '"+xmbadm+"'");
 		Boolean flag = false;
 		if(rs != null) {
 			int count = 0;  
@@ -196,10 +196,10 @@ public class GrabZheJiangDataService {
 	 * @throws SQLException 
 	 */
 	private void insertEntity(List<GrabZheJiangDataInfo> list) throws SQLException {
-		String sql = "insert into xmbqxx(xmbadm, xmmc, xmfrdw,spsx, glbm, blzd, blrq, zcrq)"
+		String sql = "insert into xmbaxx(xmbadm, xmmc, xmfrdw,spsx, glbm, blzd, blrq, zcrq)"
 				+ "values (?,?,?,?,?,?,?,?)";
 
-		Connection connection = DBConnection.getConnect("reckon");
+		Connection connection = DBConnection.getConnect("#cn-enet#");
 
 		PreparedStatement pstmt = connection.prepareStatement(sql);
 

@@ -24,7 +24,7 @@ public class test {
 		// Access中的数据库默认编码为GBK，本地项目为UTF-8，若不转码会出现乱码
 		Properties p = new Properties();
 		p.put("charSet", "GBK");
-	     connect = DriverManager.getConnection("Jdbc:Access:///E:/reckon.mdb","","");  
+	     connect = DriverManager.getConnection("Jdbc:Access:///D:/qytj/datebase/#cn-enet#.mdb","","");  
 		if (connect != null) {
 			System.out.println(connect + "\n连接成功");
 		} else {
